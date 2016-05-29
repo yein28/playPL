@@ -33,6 +33,12 @@ class CuteType:
     BINARYOP_LIST = (DIV, TIMES, MINUS, PLUS, LT, GT, EQ)
     BOOLEAN_LIST = (TRUE, FALSE)
 
+Storage = dict()
+
+def insertTable(id, value):
+	Storage[id] = value
+	temp = Storage.items()
+	return None
 
 def check_keyword(token):
     """
@@ -329,13 +335,21 @@ class CuteInterpreter(object):
     FALSE_NODE = Node(TokenType.FALSE)
 
     def run_arith(self, arith_node):
-        rhs1 = arith_node.next
-        rhs2 = rhs1.next if rhs1.next is not None else None
+		rhs1 = arith_node.next
+		rhs2 = rhs1.next if rhs1.next is not None else None
 
-        expr_rhs1 = self.run_expr(rhs1)
-        expr_rhs2 = self.run_expr(rhs2)
-        if arith_node.type is TokenType.PLUS:
-            result = int(expr_rhs1.value)+int( expr_rhs2.value )
+		if rhs1 is not None:
+			if rhs1.value in Storage.keys():
+				rhs1 = Storage[rhs1.value]
+			if rhs2 is not None:
+				if rhs2.value in Storage.keys():
+					rhs2 = Storage[rhs1.value]
+		
+		expr_rhs1 = self.run_expr(rhs1)
+		expr_rhs2 = self.run_expr(rhs2)
+
+		if arith_node.type is TokenType.PLUS:
+			result = int(expr_rhs1.value)+int( expr_rhs2.value )
             return Node(TokenType.INT, result)
         elif arith_node.type is TokenType.MINUS:
             result = int(expr_rhs1.value)-int( expr_rhs2.value )
@@ -362,10 +376,19 @@ class CuteInterpreter(object):
                 return self.TRUE_NODE
             else:
                 return self.FALSE_NODE
+		else:
+			return None
 
     def run_func(self, func_node):
-        rhs1 = func_node.next
-        rhs2 = rhs1.next if rhs1.next is not None else None
+		rhs1 = func_node.next
+		rhs2 = rhs1.next if rhs1.next is not None else None
+
+		if rhs1 is not None:
+			if rhs1.value in Storage.keys():
+				rhs1 = Storage[rhs1.value]
+			if rhs2 is not None:
+				if rhs2.value in Storage.keys():
+				rhs2 = Storage[rhs1.value]
 
         def create_quote_node(node, list_flag=False):
             """
@@ -472,9 +495,24 @@ class CuteInterpreter(object):
                 elif rhs1.next is None:
                     break
                 else:
-                    rhs1 = rhs1.next
+				rhs1 = rhs1.next
 
-        else:
+		elif func_node.type is TokenType.DEFINE:
+			rhs1 = func_node.next
+			rhs2 = rhs1.next if rhs1.next is not None else None
+			
+			if rhs2.type == TokenType.LIST:
+				if rhs2.value.type == TokenType.QUOTE:
+					rhs2 is self.run_expr(rhs2)
+					insertTable(rhs1.value, rhs2)
+				else :
+					rhs2 = self.run_expr(rhs2)
+					insertTable(rhs1.value, Node(TokenType.INT, rhs2.value))
+			elif rhs2.type == TokenType.INT:	
+				insertTable(rhs1.value, rhs2)
+			return None
+		
+		else:
             return None
 
     def run_expr(self, root_node):
@@ -507,7 +545,7 @@ class CuteInterpreter(object):
             return l_node
         if op_code.type in \
                 [TokenType.CAR, TokenType.CDR, TokenType.CONS, TokenType.ATOM_Q, \
-                 TokenType.EQ_Q, TokenType.NULL_Q, TokenType.NOT,TokenType.COND]:
+                 TokenType.EQ_Q, TokenType.NULL_Q, TokenType.NOT,TokenType.COND, TokenType.DEFINE]:
             return self.run_func(op_code)
         if op_code.type in \
                 [TokenType.PLUS, TokenType.MINUS, TokenType.TIMES, TokenType.DIV, \
@@ -599,17 +637,17 @@ def Test_method(input):
     node = test_basic_paser.parse_expr()
     cute_inter = CuteInterpreter()
     result = cute_inter.run_expr(node)
-    print print_node(result)
+    print "... " + str(print_node(result))
 
 
 def Test_All():
-    try:
-        while(1):
-            print ">",
-            testStr = raw_input()
-            print " ",
-            Test_method( testStr )
-    except KeyboardInterrupt:
-        exit()
-
+	try:
+		while True:
+			test = raw_input("> ")
+			if test == "exit":
+				break
+			else:
+				Test_method(test)
+	except KeyboardInterrupt:
+		exit()
 Test_All()
