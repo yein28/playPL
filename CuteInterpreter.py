@@ -33,12 +33,6 @@ class CuteType:
     BINARYOP_LIST = (DIV, TIMES, MINUS, PLUS, LT, GT, EQ)
     BOOLEAN_LIST = (TRUE, FALSE)
 
-Storage = dict()
-
-def insertTable(id, value):
-	Storage[id] = value
-	return None
-
 def check_keyword(token):
     """
     :type token:str
@@ -330,9 +324,15 @@ class BasicPaser(object):
 
 
 class CuteInterpreter(object):
-    TRUE_NODE = Node(TokenType.TRUE)
-    FALSE_NODE = Node(TokenType.FALSE)
+	Storage = dict()
 
+	TRUE_NODE = Node(TokenType.TRUE)
+	FALSE_NODE = Node(TokenType.FALSE)
+
+	def insertTable(self, id, value):
+		self.Storage[id] = value
+		return None
+	
     def run_arith(self, arith_node):
         rhs1 = arith_node.next
         rhs2 = rhs1.next if rhs1.next is not None else None
@@ -340,9 +340,10 @@ class CuteInterpreter(object):
         if rhs1 is not None:
             if rhs1.value in Storage.keys():
                 rhs1 = Storage[rhs1.value]
-            if rhs2 is not None:
-                if rhs2.value in Storage.keys():
-                    rhs2 = Storage[rhs1.value]
+
+		if rhs2 is not None:
+			if rhs2.value in Storage.keys():
+				rhs2 = Storage[rhs2.value]
 
         expr_rhs1 = self.run_expr(rhs1)
         expr_rhs2 = self.run_expr(rhs2)
@@ -385,9 +386,10 @@ class CuteInterpreter(object):
         if rhs1 is not None:
             if rhs1.value in Storage.keys():
                 rhs1 = Storage[rhs1.value]
-            if rhs2 is not None:
-                if rhs2.value in Storage.keys():
-                    rhs2 = Storage[rhs1.value]
+
+		if rhs2 is not None:
+			if rhs2.value in Storage.keys():
+				rhs2 = Storage[rhs1.value]
 
         def create_quote_node(node, list_flag=False):
             """
@@ -456,12 +458,14 @@ class CuteInterpreter(object):
 
         elif func_node.type is TokenType.ATOM_Q:
             if list_is_null(rhs1): return self.TRUE_NODE
+
             if rhs1.type is not TokenType.LIST: return self.TRUE_NODE
+
             if rhs1.type is TokenType.LIST:
                 if rhs1.value.type is TokenType.QUOTE:
-                    if rhs1.value.next is not TokenType.LIST:
-                        return self.TRUE_NODE
-            return self.FALSE_NODE
+                    if rhs1.value.next.type is TokenType.LIST:
+                        return self.FALSE_NODE
+            return self.TRUE_NODE
 
         elif func_node.type is TokenType.EQ_Q:
             if rhs1.type is not CuteType.INT:
