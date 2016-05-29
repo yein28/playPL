@@ -335,21 +335,21 @@ class CuteInterpreter(object):
     FALSE_NODE = Node(TokenType.FALSE)
 
     def run_arith(self, arith_node):
-		rhs1 = arith_node.next
-		rhs2 = rhs1.next if rhs1.next is not None else None
+        rhs1 = arith_node.next
+        rhs2 = rhs1.next if rhs1.next is not None else None
 
-		if rhs1 is not None:
-			if rhs1.value in Storage.keys():
-				rhs1 = Storage[rhs1.value]
-			if rhs2 is not None:
-				if rhs2.value in Storage.keys():
-					rhs2 = Storage[rhs1.value]
-		
-		expr_rhs1 = self.run_expr(rhs1)
-		expr_rhs2 = self.run_expr(rhs2)
+        if rhs1 is not None:
+            if rhs1.value in Storage.keys():
+                rhs1 = Storage[rhs1.value]
+            if rhs2 is not None:
+                if rhs2.value in Storage.keys():
+                    rhs2 = Storage[rhs1.value]
 
-		if arith_node.type is TokenType.PLUS:
-			result = int(expr_rhs1.value)+int( expr_rhs2.value )
+        expr_rhs1 = self.run_expr(rhs1)
+        expr_rhs2 = self.run_expr(rhs2)
+
+        if arith_node.type is TokenType.PLUS:
+            result = int(expr_rhs1.value)+int( expr_rhs2.value )
             return Node(TokenType.INT, result)
         elif arith_node.type is TokenType.MINUS:
             result = int(expr_rhs1.value)-int( expr_rhs2.value )
@@ -376,19 +376,19 @@ class CuteInterpreter(object):
                 return self.TRUE_NODE
             else:
                 return self.FALSE_NODE
-		else:
+        else:
 			return None
 
     def run_func(self, func_node):
-		rhs1 = func_node.next
-		rhs2 = rhs1.next if rhs1.next is not None else None
+        rhs1 = func_node.next
+        rhs2 = rhs1.next if rhs1.next is not None else None
 
-		if rhs1 is not None:
-			if rhs1.value in Storage.keys():
-				rhs1 = Storage[rhs1.value]
-			if rhs2 is not None:
-				if rhs2.value in Storage.keys():
-				rhs2 = Storage[rhs1.value]
+        if rhs1 is not None:
+            if rhs1.value in Storage.keys():
+                rhs1 = Storage[rhs1.value]
+            if rhs2 is not None:
+                if rhs2.value in Storage.keys():
+                    rhs2 = Storage[rhs1.value]
 
         def create_quote_node(node, list_flag=False):
             """
@@ -497,22 +497,21 @@ class CuteInterpreter(object):
                 else:
 				rhs1 = rhs1.next
 
-		elif func_node.type is TokenType.DEFINE:
-			rhs1 = func_node.next
-			rhs2 = rhs1.next if rhs1.next is not None else None
-			
-			if rhs2.type == TokenType.LIST:
-				if rhs2.value.type == TokenType.QUOTE:
-					rhs2 is self.run_expr(rhs2)
-					insertTable(rhs1.value, rhs2)
-				else :
-					rhs2 = self.run_expr(rhs2)
-					insertTable(rhs1.value, Node(TokenType.INT, rhs2.value))
-			elif rhs2.type == TokenType.INT:	
-				insertTable(rhs1.value, rhs2)
-			return None
-		
-		else:
+        elif func_node.type is TokenType.DEFINE:
+            if rhs2.type == TokenType.LIST:
+                if rhs2.value.type == TokenType.QUOTE:
+                    rhs2 is self.run_expr(rhs2)
+                    insertTable(rhs1.value, rhs2)
+                else :
+                    rhs2 = self.run_expr(rhs2)
+                    insertTable(rhs1.value, Node(TokenType.INT, rhs2.value))
+
+            elif rhs2.type == TokenType.INT:
+                insertTable(rhs1.value, rhs2)
+
+            return None
+
+        else :
             return None
 
     def run_expr(self, root_node):
