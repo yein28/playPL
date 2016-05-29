@@ -599,17 +599,17 @@ def Test_method(input):
     node = test_basic_paser.parse_expr()
     cute_inter = CuteInterpreter()
     result = cute_inter.run_expr(node)
-    print print_node(result)
+    print "... " + str(print_node(result))
 
 
 def Test_All():
-    try:
-        while(1):
-            print ">",
-            testStr = raw_input()
-            print " ",
-            Test_method( testStr )
-    except KeyboardInterrupt:
-        exit()
-
+	try:
+		while True:
+			test = raw_input("> ")
+			if test == "exit":
+				break
+			else:
+				Test_method(test)
+	except KeyboardInterrupt:
+		exit()
 Test_All()
