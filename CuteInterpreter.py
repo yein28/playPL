@@ -37,7 +37,6 @@ Storage = dict()
 
 def insertTable(id, value):
 	Storage[id] = value
-	temp = Storage.items()
 	return None
 
 def check_keyword(token):
@@ -498,8 +497,11 @@ class CuteInterpreter(object):
 				rhs1 = rhs1.next
 
         elif func_node.type is TokenType.DEFINE:
+			rhs1 = func_node.next
+			rhs2 = rhs1.next if rhs1.next is not None else None
+
             if rhs2.type == TokenType.LIST:
-                if rhs2.value.type == TokenType.QUOTE:
+				if rhs2.value.type == TokenType.QUOTE:
                     rhs2 is self.run_expr(rhs2)
                     insertTable(rhs1.value, rhs2)
                 else :
