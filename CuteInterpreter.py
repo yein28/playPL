@@ -317,19 +317,19 @@ class BasicPaser(object):
         return head
 
 
-class CuteInterpreter(object):
-    Storage = dict()
+Storage = dict()
 
+class CuteInterpreter(object):
     TRUE_NODE = Node(TokenType.TRUE)
     FALSE_NODE = Node(TokenType.FALSE)
 
     def insertTable(self, id, value):
-        self.Storage[id] = value
+        Storage[id] = value
         return None
 
     def lookupTable(self, id):
-        if id.value in self.Storage.keys():
-            return self.Storage[id.value]
+        if id.value in Storage.keys():
+            return Storage[id.value]
         else:
             return id
 
@@ -501,16 +501,20 @@ class CuteInterpreter(object):
             rhs1 = func_node.next
             rhs2 = rhs1.next if rhs1.next is not None else None
 
-            if rhs2.type == TokenType.LIST:
-                if rhs2.value.type == TokenType.QUOTE:
+            if rhs2.type is TokenType.LIST:
+                if rhs2.value.type is TokenType.QUOTE:
                     rhs2 = self.run_expr(rhs2)
                     self.insertTable(rhs1.value, rhs2)
                 else:
                     rhs2 = self.run_expr(rhs2)
                     self.insertTable(rhs1.value, Node(TokenType.INT, rhs2.value))
 
-            elif rhs2.type == TokenType.INT:
-                self.insertTable(rhs1.value, rhs2)
+            elif rhs2.type is TokenType.INT:
+				self.insertTable(rhs1.value, rhs2)
+			
+			elif rhs2.value in Storage.keys():
+				rhs2 = self.lookupTable(rhs2)
+				self.insertTable(rhs1.value, rhs2)
 
             return None
 
@@ -525,7 +529,10 @@ class CuteInterpreter(object):
             return None
 
         if root_node.type is TokenType.ID:
-            return root_node
+			if root_node.value in Storage.keys():
+				return self.run_expr(Storge.get(root_node.value) )
+			else:
+	            return root_node
         elif root_node.type is TokenType.INT:
             return root_node
         elif root_node.type is TokenType.TRUE:
