@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from string import letters,digits
 
-
 class CuteType:
     INT = 1
     ID = 4
@@ -43,7 +42,6 @@ def check_keyword(token):
         return True
     return False
 
-
 def is_type_keyword(token):
     if 20 <= token.type <= 30:
         return True
@@ -65,10 +63,7 @@ def _get_keyword_type(token):
         'eq?': CuteType.EQ_Q
     }[token]
 
-
-CUTETYPE_NAMES = dict((eval(attr, globals(), CuteType.__dict__), attr) for attr in dir(CuteType()) if
-                      not callable(attr) and not attr.startswith("__"))
-
+CUTETYPE_NAMES=dict((eval(attr, globals(), CuteType.__dict__), attr) for attr in dir(CuteType()) if not callable(attr) and not attr.startswith("__"))
 
 def is_type_binaryOp(token):
     """
@@ -79,7 +74,6 @@ def is_type_binaryOp(token):
     if token.type in CuteType.BINARYOP_LIST:
         return True
     return False
-
 
 def is_type_boolean(token):
     """
@@ -332,18 +326,22 @@ class CuteInterpreter(object):
 	def insertTable(self, id, value):
 		self.Storage[id] = value
 		return None
-	
+
+	def lookupTable(self, id):
+		if id.value in self.Storage.keys():
+			return self.Storage[id.value]
+		else:
+			return id
+
     def run_arith(self, arith_node):
         rhs1 = arith_node.next
         rhs2 = rhs1.next if rhs1.next is not None else None
 
         if rhs1 is not None:
-            if rhs1.value in Storage.keys():
-                rhs1 = Storage[rhs1.value]
+			rhs1 = self.lookupTable(rhs1)
 
 		if rhs2 is not None:
-			if rhs2.value in Storage.keys():
-				rhs2 = Storage[rhs2.value]
+			rhs2 = self.lookupTable(rhs2)
 
         expr_rhs1 = self.run_expr(rhs1)
         expr_rhs2 = self.run_expr(rhs2)
@@ -384,12 +382,10 @@ class CuteInterpreter(object):
         rhs2 = rhs1.next if rhs1.next is not None else None
 
         if rhs1 is not None:
-            if rhs1.value in Storage.keys():
-                rhs1 = Storage[rhs1.value]
+			rhs1 = self.lookupTable(rhs1)
 
 		if rhs2 is not None:
-			if rhs2.value in Storage.keys():
-				rhs2 = Storage[rhs1.value]
+			rhs2 = self.lookupTable(rhs2)
 
         def create_quote_node(node, list_flag=False):
             """
