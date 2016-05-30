@@ -510,12 +510,10 @@ class CuteInterpreter(object):
                     self.insertTable(rhs1.value, Node(TokenType.INT, rhs2.value))
 
             elif rhs2.type is TokenType.INT:
-				self.insertTable(rhs1.value, rhs2)
-			
-			elif rhs2.value in Storage.keys():
-				rhs2 = self.lookupTable(rhs2)
-				self.insertTable(rhs1.value, rhs2)
-
+                self.insertTable(rhs1.value, rhs2)
+            elif rhs2.value in Storage.keys():
+                rhs2 = self.lookupTable(rhs2)
+                self.insertTable(rhs1.value, rhs2)
             return None
 
         else:
@@ -529,10 +527,10 @@ class CuteInterpreter(object):
             return None
 
         if root_node.type is TokenType.ID:
-			if root_node.value in Storage.keys():
-				return self.run_expr(Storge.get(root_node.value) )
-			else:
-	            return root_node
+            if root_node.value in Storage.keys():
+                return self.run_expr(Storage.get(root_node.value) )
+            else:
+                return root_node
         elif root_node.type is TokenType.INT:
             return root_node
         elif root_node.type is TokenType.TRUE:
@@ -650,13 +648,13 @@ def Test_method(input):
 
 
 def Test_All():
-	try:
-		while True:
-			test = raw_input("> ")
-			if test == "exit":
-				break
-			else:
-				Test_method(test)
-	except KeyboardInterrupt:
-		exit()
+    try:
+        while True:
+            test = raw_input("> ")
+            if test == "exit":
+                break
+            else:
+                Test_method(test)
+    except KeyboardInterrupt:
+        exit()
 Test_All()
