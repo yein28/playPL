@@ -318,30 +318,30 @@ class BasicPaser(object):
 
 
 class CuteInterpreter(object):
-	Storage = dict()
+    Storage = dict()
 
-	TRUE_NODE = Node(TokenType.TRUE)
-	FALSE_NODE = Node(TokenType.FALSE)
+    TRUE_NODE = Node(TokenType.TRUE)
+    FALSE_NODE = Node(TokenType.FALSE)
 
-	def insertTable(self, id, value):
-		self.Storage[id] = value
-		return None
+    def insertTable(self, id, value):
+        self.Storage[id] = value
+        return None
 
-	def lookupTable(self, id):
-		if id.value in self.Storage.keys():
-			return self.Storage[id.value]
-		else:
-			return id
+    def lookupTable(self, id):
+        if id.value in self.Storage.keys():
+            return self.Storage[id.value]
+        else:
+            return id
 
     def run_arith(self, arith_node):
         rhs1 = arith_node.next
         rhs2 = rhs1.next if rhs1.next is not None else None
 
         if rhs1 is not None:
-			rhs1 = self.lookupTable(rhs1)
+            rhs1 = self.lookupTable(rhs1)
 
-		if rhs2 is not None:
-			rhs2 = self.lookupTable(rhs2)
+        if rhs2 is not None:
+            rhs2 = self.lookupTable(rhs2)
 
         expr_rhs1 = self.run_expr(rhs1)
         expr_rhs2 = self.run_expr(rhs2)
@@ -375,17 +375,17 @@ class CuteInterpreter(object):
             else:
                 return self.FALSE_NODE
         else:
-			return None
+            return None
 
     def run_func(self, func_node):
         rhs1 = func_node.next
         rhs2 = rhs1.next if rhs1.next is not None else None
 
         if rhs1 is not None:
-			rhs1 = self.lookupTable(rhs1)
+            rhs1 = self.lookupTable(rhs1)
 
-		if rhs2 is not None:
-			rhs2 = self.lookupTable(rhs2)
+        if rhs2 is not None:
+            rhs2 = self.lookupTable(rhs2)
 
         def create_quote_node(node, list_flag=False):
             """
@@ -488,32 +488,33 @@ class CuteInterpreter(object):
 
         elif func_node.type is TokenType.COND:
             while True:
-                if self.run_list(rhs1.value).type is TokenType.TRUE or \
-                                rhs1.value.type is TokenType.TRUE:
+                if self.run_list(rhs1.value).type is TokenType.TRUE :
                     return rhs1.value.next
+
                 elif rhs1.next is None:
                     break
+
                 else:
-				rhs1 = rhs1.next
+                    rhs1 = rhs1.next
 
         elif func_node.type is TokenType.DEFINE:
-			rhs1 = func_node.next
-			rhs2 = rhs1.next if rhs1.next is not None else None
+            rhs1 = func_node.next
+            rhs2 = rhs1.next if rhs1.next is not None else None
 
             if rhs2.type == TokenType.LIST:
-				if rhs2.value.type == TokenType.QUOTE:
+                if rhs2.value.type == TokenType.QUOTE:
                     rhs2 is self.run_expr(rhs2)
-                    insertTable(rhs1.value, rhs2)
-                else :
+                    self.insertTable(rhs1.value, rhs2)
+                else:
                     rhs2 = self.run_expr(rhs2)
-                    insertTable(rhs1.value, Node(TokenType.INT, rhs2.value))
+                    self.insertTable(rhs1.value, Node(TokenType.INT, rhs2.value))
 
             elif rhs2.type == TokenType.INT:
-                insertTable(rhs1.value, rhs2)
+                self.insertTable(rhs1.value, rhs2)
 
             return None
 
-        else :
+        else:
             return None
 
     def run_expr(self, root_node):
