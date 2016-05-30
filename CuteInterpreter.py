@@ -503,7 +503,7 @@ class CuteInterpreter(object):
 
             if rhs2.type == TokenType.LIST:
                 if rhs2.value.type == TokenType.QUOTE:
-                    rhs2 is self.run_expr(rhs2)
+                    rhs2 = self.run_expr(rhs2)
                     self.insertTable(rhs1.value, rhs2)
                 else:
                     rhs2 = self.run_expr(rhs2)
